@@ -1,0 +1,48 @@
+# Shield AI deployment configuration.
+# Copy to config/shield.toml (or point SHIELD_CONFIG at another file) and edit.
+# Every value here is reviewed at start-up by the sovereignty checks in
+# shield/security/residency.py. The platform refuses to start in "production"
+# mode if a check fails.
+
+[deployment]
+name = "Riverton Public Health Authority"
+environment = "demo"            # demo | staging | production
+timezone = "UTC"
+
+[sovereignty]
+country_code = "RV"             # ISO 3166-1 alpha-2 of the deploying country
+jurisdiction = "City of Riverton"
+# Region label of the infrastructure this instance runs on. Must be in
+# allowed_storage_regions or the platform refuses to start.
+hosting_region = "rv-national-dc-1"
+allowed_storage_regions = ["rv-national-dc-1", "rv-national-dc-2"]
+# Outbound network destinations the process may contact. Everything else is
+# blocked inside the process by the egress guard (defence in depth on top of
+# network firewalls). Hostname globs and CIDR ranges are supported.
+allowed_egress = ["127.0.0.0/8", "::1", "localhost", "10.0.0.0/8", "*.riverton.gov.example"]
+enforce_egress_guard = true
+data_dir = "./data"
+
+[security]
+token_ttl_minutes = 480
+min_cell_size = 5               # small-cell suppression threshold for aggregate views
+key_dir = "./data/keys"         # production: replace with HSM / in-country KMS
+
+[agent]
+alert_alpha = 0.01              # base false-alarm rate per series for temporal detectors
+fdr_q = 0.05                    # Benjamini-Hochberg false discovery rate across series
+scan_replicates = 999           # Monte Carlo replicates for scan statistics
+notify_min_confidence = 0.50    # below this an event stays on the watch list
+lookback_days = 14
+
+[narrative]
+backend = "template"            # template | local_llm
+# Only used when backend = "local_llm". Must be an in-country endpoint that is
+# also listed in allowed_egress. OpenAI-compatible chat completions API.
+local_llm_url = "http://10.0.0.20:8000/v1/chat/completions"
+local_llm_model = "local-open-weights-model"
+
+[notifications]
+# In-country webhook receivers (e.g. the ministry's incident system). Each URL
+# is checked against allowed_egress before any delivery is attempted.
+webhooks = []

@@ -1,0 +1,299 @@
+{
+ "_note": "Historical outbreaks used for context. Figures are as published by the cited sources; where sources differ, the range or the most authoritative figure is given. Re-verify figures against the sources before an official presentation. Projections scale published attack/hospitalisation/death rates to the affected population and are illustrative, not forecasts.",
+ "events": [
+  {
+   "id": "h1n1_2009",
+   "name": "2009 H1N1 influenza pandemic (United States)",
+   "years": "2009-2010",
+   "location": "United States",
+   "matches": [
+    "novel_respiratory",
+    "seasonal_influenza"
+   ],
+   "pathogen": "Influenza A(H1N1)pdm09",
+   "cases": "about 60.8 million (range 43.3-89.3 million)",
+   "hospitalisations": "274,304 (range 195,086-402,719)",
+   "deaths": "12,469 in the US (range 8,868-18,306); 151,700-575,400 worldwide in the first year",
+   "economic_impact": "Mass vaccination campaign; school closures in several states.",
+   "social_impact": "Deaths concentrated in working-age adults (about 9,570 of the US deaths were aged 18-64).",
+   "population": 307000000,
+   "rates": {
+    "attack_rate": 0.198,
+    "hospitalisation_per_100k": 89.4,
+    "deaths_per_100k": 4.06
+   },
+   "lessons": "A novel virus first spread among young people and schools; surveillance and rapid vaccine production mattered.",
+   "sources": [
+    {
+     "title": "CDC estimates of 2009 H1N1 influenza cases, hospitalizations and deaths",
+     "url": "https://archive.cdc.gov/www_cdc_gov/h1n1flu/estimates_2009_h1n1.htm"
+    },
+    {
+     "title": "CDC: 2009 H1N1 Pandemic",
+     "url": "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/2009-h1n1-pandemic.html"
+    }
+   ]
+  },
+  {
+   "id": "covid_2020",
+   "name": "COVID-19 pandemic",
+   "years": "2020-2023",
+   "location": "Worldwide",
+   "matches": [
+    "novel_respiratory",
+    "sars_cov_2"
+   ],
+   "pathogen": "SARS-CoV-2",
+   "cases": "Hundreds of millions of reported infections",
+   "deaths": "About 14.9 million excess deaths in 2020-2021 (range 13.3-16.6 million, WHO)",
+   "hospitalisations": "Health systems in many countries exceeded intensive-care capacity",
+   "economic_impact": "Global output fell by roughly 3% in 2020, the deepest contraction since the Great Depression (IMF World Economic Outlook).",
+   "social_impact": "Prolonged school closures, lockdowns, disruption of routine care, long-term effects on learning and mental health.",
+   "lessons": "Weeks of earlier detection of an unexplained pneumonia cluster, open data sharing and rapid testing change outcomes by orders of magnitude.",
+   "sources": [
+    {
+     "title": "WHO: 14.9 million excess deaths associated with the COVID-19 pandemic in 2020 and 2021",
+     "url": "https://www.who.int/news/item/05-05-2022-14.9-million-excess-deaths-were-associated-with-the-COVID-19-pandemic-in-2020-and-2021"
+    }
+   ]
+  },
+  {
+   "id": "sars_2003",
+   "name": "SARS outbreak",
+   "years": "2002-2003",
+   "location": "29 countries (largest in China, Hong Kong, Taiwan, Singapore, Canada)",
+   "matches": [
+    "novel_respiratory"
+   ],
+   "pathogen": "SARS coronavirus",
+   "cases": "8,096 probable cases (WHO)",
+   "deaths": "774 (about 10% case fatality), including 43 in Canada",
+   "hospitalisations": "Most cases were hospitalised; many were health-care workers",
+   "economic_impact": "Lee and McKibbin (2004) modelled large global losses concentrated in East Asia, driven by falls in travel, retail and confidence.",
+   "social_impact": "Hospital outbreaks, quarantine of thousands of contacts in Toronto and Asia, travel advisories.",
+   "lessons": "Early recognition of an unexplained severe pneumonia cluster and strict infection control in hospitals were decisive.",
+   "sources": [
+    {
+     "title": "Lee & McKibbin, Globalization and Disease: The Case of SARS (Brookings)",
+     "url": "https://www.brookings.edu/articles/globalization-and-disease-the-case-of-sars/"
+    }
+   ]
+  },
+  {
+   "id": "mers_korea_2015",
+   "name": "MERS outbreak, Republic of Korea",
+   "years": "2015",
+   "location": "Republic of Korea",
+   "matches": [
+    "novel_respiratory"
+   ],
+   "pathogen": "MERS coronavirus",
+   "cases": "186",
+   "deaths": "38",
+   "hospitalisations": "All cases; transmission mainly inside hospitals",
+   "economic_impact": "Tourism losses estimated at up to 3.4 trillion won (Korea Culture & Tourism Institute); the Bank of Korea cut its 2015 growth forecast from 3.1% to 2.8%; a 22 trillion won (about US$19.8 billion) stimulus package followed.",
+   "social_impact": "Thousands quarantined; schools closed; a single imported case seeded the outbreak.",
+   "lessons": "Delayed recognition in emergency departments allowed super-spreading; transparency about affected hospitals restored trust.",
+   "sources": [
+    {
+     "title": "Korea Times: tourism industry suffers 3.4 trillion won loss from MERS",
+     "url": "https://www.koreatimes.co.kr/southkorea/20151106/tourism-industry-suffers-34-tln-won-loss-from-mers-outbreak-report"
+    }
+   ]
+  },
+  {
+   "id": "flu_1918",
+   "name": "1918 influenza pandemic (H1N1)",
+   "years": "1918-1919",
+   "location": "Worldwide",
+   "matches": [
+    "novel_respiratory",
+    "seasonal_influenza"
+   ],
+   "pathogen": "Influenza A(H1N1)",
+   "cases": "about 500 million infected (one third of the world's population)",
+   "deaths": "at least 50 million worldwide",
+   "hospitalisations": null,
+   "economic_impact": "Large but poorly measured; widespread closures of schools, theatres and businesses.",
+   "social_impact": "High mortality among young adults; overwhelmed health systems.",
+   "rates": {
+    "attack_rate": 0.33
+   },
+   "lessons": "Early, sustained non-pharmaceutical interventions were associated with lower peak mortality in US cities.",
+   "sources": [
+    {
+     "title": "CDC: 1918 Pandemic (H1N1 virus)",
+     "url": "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html"
+    }
+   ]
+  },
+  {
+   "id": "amoy_gardens_2003",
+   "name": "SARS cluster at Amoy Gardens housing estate, Hong Kong",
+   "years": "2003",
+   "location": "Amoy Gardens, Hong Kong",
+   "matches": [
+    "novel_respiratory"
+   ],
+   "pathogen": "SARS coronavirus",
+   "cases": "329 residents",
+   "deaths": "42 (reported figures range from 33 to 42)",
+   "hospitalisations": "Most cases",
+   "economic_impact": "Block E isolated and residents moved to quarantine camps.",
+   "social_impact": "About one fifth of Hong Kong's 1,755 SARS cases came from this single estate.",
+   "lessons": "A neighbourhood-level cluster can signal an environmental transmission route (here, faulty drainage) that needs engineering, not only clinical, investigation.",
+   "sources": [
+    {
+     "title": "WHO Disease Outbreak News, 17 April 2003",
+     "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2003_04_17-en"
+    }
+   ]
+  },
+  {
+   "id": "milwaukee_crypto_1993",
+   "name": "Cryptosporidium outbreak from the municipal water supply, Milwaukee",
+   "years": "1993",
+   "location": "Milwaukee, Wisconsin, USA",
+   "matches": [
+    "waterborne",
+    "norovirus",
+    "foodborne_bacterial"
+   ],
+   "pathogen": "Cryptosporidium",
+   "cases": "about 403,000 residents ill",
+   "hospitalisations": "about 4,400",
+   "deaths": "at least 69 (mostly immunocompromised people)",
+   "economic_impact": "US$96.2 million in 1993 dollars: US$31.7 million medical costs and US$64.6 million lost productivity (Corso et al. 2003).",
+   "social_impact": "Boil-water advisory for the whole city; the largest documented waterborne outbreak in US history.",
+   "population": 1610000,
+   "rates": {
+    "attack_rate": 0.25,
+    "hospitalisation_per_100k": 273,
+    "deaths_per_100k": 4.3
+   },
+   "lessons": "Rises in pharmacy sales of anti-diarrhoeals and in GI visits across a wide area preceded official recognition.",
+   "sources": [
+    {
+     "title": "Corso et al., Costs of illness in the 1993 waterborne Cryptosporidium outbreak, Emerging Infectious Diseases 2003",
+     "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2957981/"
+    }
+   ],
+   "population_note": "Approximate population of the greater Milwaukee area served by the affected water utility; rates are approximate."
+  },
+  {
+   "id": "ehec_germany_2011",
+   "name": "E. coli O104:H4 outbreak, Germany",
+   "years": "2011",
+   "location": "Germany (cases in 15 other countries)",
+   "matches": [
+    "stec",
+    "foodborne_bacterial"
+   ],
+   "pathogen": "Shiga toxin-producing E. coli O104:H4",
+   "cases": "more than 3,800 in Germany",
+   "hospitalisations": "about 850 cases of haemolytic uraemic syndrome",
+   "deaths": "53",
+   "economic_impact": "Severe losses for vegetable growers after early public warnings about cucumbers, tomatoes and lettuce; the vehicle was fenugreek sprouts.",
+   "social_impact": "Adults, especially women, were most affected; dialysis capacity strained.",
+   "lessons": "Fast, accurate source attribution matters: premature attribution caused large economic damage to the wrong sector.",
+   "sources": [
+    {
+     "title": "Robert Koch Institute: Final presentation and evaluation of the EHEC O104:H4/HUS outbreak",
+     "url": "https://edoc.rki.de/handle/176904/1349"
+    }
+   ]
+  },
+  {
+   "id": "legionella_bronx_2015",
+   "name": "Legionnaires' disease outbreak, South Bronx, New York City",
+   "years": "2015",
+   "location": "South Bronx, New York City, USA",
+   "matches": [
+    "legionella"
+   ],
+   "pathogen": "Legionella pneumophila",
+   "cases": "128 (as of the end of the outbreak, 20 August 2015)",
+   "deaths": "12",
+   "hospitalisations": "Most cases",
+   "economic_impact": "Emergency disinfection of cooling towers city-wide; new registration and inspection requirements for cooling towers in New York City and State.",
+   "social_impact": "Concentrated in a low-income neighbourhood; strong public concern and political scrutiny.",
+   "lessons": "Spatial clustering of pneumonia among older adults should trigger an environmental search for aerosol sources within days.",
+   "sources": [
+    {
+     "title": "NY1: Health commissioner says Legionnaires' outbreak in South Bronx is over",
+     "url": "https://ny1.com/nyc/all-boroughs/news/2015/08/20/health-commissioner-says-legionnaires--outbreak-in-south-bronx-is-over"
+    }
+   ]
+  },
+  {
+   "id": "measles_samoa_2019",
+   "name": "Measles epidemic, Samoa",
+   "years": "2019",
+   "location": "Samoa (population about 200,874)",
+   "matches": [
+    "measles"
+   ],
+   "pathogen": "Measles virus",
+   "cases": "5,707",
+   "deaths": "83, mostly young children",
+   "hospitalisations": "more than 1,800",
+   "economic_impact": "State of emergency; government services and businesses closed for mass vaccination days.",
+   "social_impact": "Schools and the university closed; vaccination coverage raised from about 31% to about 94% of the eligible population in weeks.",
+   "population": 200874,
+   "rates": {
+    "attack_rate": 0.0284,
+    "hospitalisation_per_100k": 918,
+    "deaths_per_100k": 41.3
+   },
+   "lessons": "Low childhood vaccination coverage turns a single introduction into a national emergency.",
+   "sources": [
+    {
+     "title": "2019 Samoa measles outbreak (summary with primary references)",
+     "url": "https://en.wikipedia.org/wiki/2019_Samoa_measles_outbreak"
+    }
+   ]
+  },
+  {
+   "id": "norovirus_burden",
+   "name": "Norovirus: annual global burden",
+   "years": "annual",
+   "location": "Worldwide",
+   "matches": [
+    "norovirus"
+   ],
+   "pathogen": "Norovirus",
+   "cases": "nearly 700 million illnesses per year",
+   "deaths": null,
+   "hospitalisations": null,
+   "economic_impact": "US$4.2 billion direct health-system costs and US$60.3 billion societal costs per year; children under 5 account for about US$39.8 billion (Bartsch et al. 2016).",
+   "social_impact": "School and care-home outbreaks cause closures and staff absence.",
+   "lessons": "School outbreaks are usually short; rapid exclusion of ill pupils and staff for 48 hours after symptoms and chlorine cleaning shorten them.",
+   "sources": [
+    {
+     "title": "Bartsch et al., Global economic burden of norovirus gastroenteritis, PLoS ONE 2016",
+     "url": "https://publichealth.jhu.edu/2016/the-high-cost-of-norovirus-worldwide"
+    }
+   ]
+  },
+  {
+   "id": "ebola_west_africa_2014",
+   "name": "Ebola virus disease epidemic, West Africa",
+   "years": "2014-2016",
+   "location": "Guinea, Liberia, Sierra Leone",
+   "matches": [],
+   "pathogen": "Ebola virus",
+   "cases": "about 28,600",
+   "deaths": "more than 11,300",
+   "hospitalisations": "Health systems collapsed in the three most affected countries",
+   "economic_impact": "Total economic and social burden estimated at US$53.19 billion, including deaths from other diseases due to disrupted care (Huber et al. 2018).",
+   "social_impact": "Schools closed for months; routine immunisation and maternal care disrupted.",
+   "lessons": "Indirect deaths from disrupted health services can exceed direct deaths; early community engagement is essential.",
+   "sources": [
+    {
+     "title": "Huber, Finelli & Stevens, The economic and social burden of the 2014 Ebola outbreak in West Africa, J Infect Dis 2018",
+     "url": "https://www.healio.com/news/infectious-disease/20181018/west-african-ebola-epidemic-cost-53-billion-according-to-new-estimate"
+    }
+   ]
+  }
+ ]
+}

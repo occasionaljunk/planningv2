@@ -1,0 +1,22 @@
+# Single-node deployment for a pilot. Terminate TLS in front of this service
+# (in-country load balancer or reverse proxy) and keep the volume on encrypted,
+# in-country storage.
+services:
+  shield:
+    build: .
+    image: shield-ai:0.1.0
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      SHIELD_DATA_DIR: /data
+      SHIELD_ENV: demo
+    volumes:
+      - shield-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+volumes:
+  shield-data:

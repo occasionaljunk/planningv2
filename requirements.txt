@@ -1,0 +1,9 @@
+# Runtime dependencies (pinned versions tested with this MVP)
+fastapi==0.143.0
+uvicorn==0.53.0
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+cryptography==50.0.1
+pydantic==2.13.5
+httpx==0.28.1

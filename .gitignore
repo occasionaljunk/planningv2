@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+# Runtime data, keys and databases never go into source control
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+keys/
+*.key
+config/shield.toml

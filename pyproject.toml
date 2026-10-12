@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shield-ai"
+version = "0.1.0"
+description = "Shield AI: sovereign epidemic-intelligence platform for governments (MVP)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary. All rights reserved." }
+authors = [{ name = "Anmol Parashar" }]
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "scipy>=1.11",
+  "cryptography>=42",
+  "pydantic>=2.6",
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "statsmodels>=0.14"]
+
+[tool.setuptools.packages.find]
+include = ["shield*"]
+
+[tool.setuptools.package-data]
+shield = ["knowledge/*.json", "web/*", "web/vendor/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

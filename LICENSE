@@ -1,0 +1,11 @@
+Copyright (c) 2026 Anmol Parashar. All rights reserved.
+
+This software and its documentation are proprietary and confidential. No part
+of it may be copied, modified, distributed or used without the prior written
+permission of the copyright holder.
+
+Third-party open-source components used at runtime (installed separately via
+requirements.txt) remain under their own licences: FastAPI and Starlette (MIT),
+Uvicorn (BSD-3-Clause), NumPy (BSD-3-Clause), pandas (BSD-3-Clause), SciPy
+(BSD-3-Clause), cryptography (Apache-2.0 / BSD), Pydantic (MIT), HTTPX
+(BSD-3-Clause).
