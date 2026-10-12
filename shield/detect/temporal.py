@@ -74,8 +74,13 @@ def seasonal_profile(y: np.ndarray, doy: np.ndarray, year: np.ndarray, exclude_f
 
 
 def _design(t: np.ndarray, dow: np.ndarray, holiday: np.ndarray, harmonics: int = 2,
-            profile: np.ndarray | None = None) -> np.ndarray:
+            profile: np.ndarray | None = None, term: np.ndarray | None = None) -> np.ndarray:
     cols = [np.ones_like(t, dtype=float), t / 365.25]
+    if term is not None:
+        # academic calendar: in-term indicator and a decaying return-to-school effect
+        for k in range(term.shape[1]):
+            if term[:, k].std() > 0:
+                cols.append(term[:, k])
     if profile is not None:
         lp = np.log(profile + 0.5)
         cols.append((lp - lp.mean()) / (lp.std() + 1e-9))
@@ -116,7 +121,7 @@ def rare_event_test(y: np.ndarray, T: int, alpha: float = 0.01, window: int = 7,
 def regression_detector(y: np.ndarray, t: np.ndarray, dow: np.ndarray, holiday: np.ndarray, T: int,
                         eval_days: int = 14, history: int = 730, alpha: float = 0.01,
                         min_history: int = 84, doy: np.ndarray | None = None,
-                        year: np.ndarray | None = None) -> RegressionOutput | None:
+                        year: np.ndarray | None = None, term: np.ndarray | None = None) -> RegressionOutput | None:
     """y, t, dow, holiday are full-length daily arrays; T is the analysis-day index."""
     # Fit on history that ends before the evaluation window, so a current
     # outbreak cannot inflate its own baseline (the window acts as guard band).
@@ -130,7 +135,8 @@ def regression_detector(y: np.ndarray, t: np.ndarray, dow: np.ndarray, holiday: 
     if doy is not None and year is not None and train_end - train_start >= 400:
         profile = seasonal_profile(y[:T + 1], doy[:T + 1], year[:T + 1], T - eval_days + 1)
     harmonics = (1 if profile is not None else 2) if train_end - train_start >= 540 else (1 if train_end - train_start >= 300 else 0)
-    X = _design(t[:T + 1], dow[:T + 1], holiday[:T + 1], harmonics, profile)
+    X = _design(t[:T + 1], dow[:T + 1], holiday[:T + 1], harmonics, profile,
+                term[:T + 1] if term is not None else None)
     Xtr, ytr = X[tr], y[tr]
     if ytr.sum() == 0:
         return None
@@ -139,8 +145,19 @@ def regression_detector(y: np.ndarray, t: np.ndarray, dow: np.ndarray, holiday: 
     w = np.where(res > 2.58, 1.0 / np.maximum(res, 1e-6) ** 2, 1.0)
     w = w * len(w) / w.sum()
     fit = fit_poisson(Xtr, ytr, weights=w, start=fit.beta)
+    # Long-run level. With a same-season profile, a linear trend is dropped: one unusually severe season can
+    # tilt it and the tilt would be extrapolated into the evaluation window. Level drift is handled instead by
+    # recalibrating to the last four weeks of training data (shrunk towards no change).
+    trend_kept = profile is None
+    if not trend_kept:
+        X = np.delete(X, 1, axis=1)
+        Xtr = X[tr]
+        fit = fit_poisson(Xtr, ytr, weights=w)
     Xev = X[ev]
-    mu = np.exp(np.clip(Xev @ fit.beta, -30, 30))
+    recent = slice(max(train_start, train_end - 27), train_end + 1)
+    o_r, e_r = float(y[recent].sum()), float(np.exp(np.clip(X[recent] @ fit.beta, -30, 30)).sum())
+    level = float(np.clip((o_r + 10) / (e_r + 10), 0.67, 1.5))
+    mu = np.exp(np.clip(Xev @ fit.beta, -30, 30)) * level
     phi = fit.phi
     yev = y[ev]
     upper = nb_quantile(1 - alpha, mu, phi)
@@ -152,9 +169,11 @@ def regression_detector(y: np.ndarray, t: np.ndarray, dow: np.ndarray, holiday: 
     r7 = DetectorResult("regression_7d", bool(o7 > u7 and o7 >= 3), p7, float((o7 - e7) / max(u7 - e7, 1e-9)),
                         float(o7), float(e7), u7, 7, {"phi": round(phi, 3), "harmonics": harmonics,
                                                        "seasonal_profile": profile is not None,
+                                                       "trend": bool(trend_kept), "recalibration": round(level, 3),
                                                        "training_days": int(train_end - train_start + 1)})
     out = RegressionOutput(mu, upper, phi, daily_p, z, r7, int(train_end - train_start + 1))
     out.mu_all = np.exp(np.clip(X @ fit.beta, -30, 30))
+    out.mu_all[T - eval_days + 1:] *= level
     return out
 
 

@@ -1,7 +1,7 @@
 # Demo script for a government audience (25-35 minutes)
 
 **Setup.**
-- Run `make demo-live` the day before. It stops the clock at 10 September 2026, before any alert.
+- Run `make demo-live` the day before. It stops the clock at 14 September 2026, the last day of the historical back-fill, before any alert.
 - Run `make serve` and open http://127.0.0.1:8000.
 - Use one browser window signed in as the Health Minister and one as the Chief Epidemiologist.
 - If time is short, use `make demo` instead (clock at 10 October, all alerts already raised) and skip step 3.
@@ -34,9 +34,10 @@
 **What appears:**
 - **15 September: university respiratory cluster.**
   - Only 13 patients have seen a doctor, mostly students at Riverton State University.
-  - Their respiratory panels are negative for influenza, RSV and SARS-CoV-2, so the leading explanation is already **novel or emerging respiratory pathogen**.
-  - Over the following days the same alert grows, gains a doubling time and Rt, and spreads to Harbour College and Old Harbour.
-  - Open **How the assessment evolved**.
+  - The agent alerts at once. At first the most likely explanation is a COVID-19 wave.
+  - Over the next week the respiratory panels keep coming back negative for influenza, RSV and SARS-CoV-2.
+  - From about 22 September the same alert's leading explanation becomes **novel or emerging respiratory pathogen**, with a doubling time, an Rt, and spread to Harbour College and Old Harbour.
+  - Open **How the assessment evolved** to show the agent changing its mind as evidence arrived.
 - **24 September: school norovirus.** A gastrointestinal cluster at Northgate Primary School the day after the first children presented, with norovirus-positive stool tests.
 - **1 October: a hospital rise in gastrointestinal illness.**
   - Within its first days the agent explains it as a **probable data artefact**, keeps it on the watch list and does not notify.
@@ -51,9 +52,9 @@
 - **Evidence.**
   - Epidemic curve against what was expected.
   - Doubling time and reproduction number.
-  - The 18–24 age group 2.5 times over-represented.
+  - The 18–24 age group 2.7 times over-represented.
   - Riverton State University and Harbour College attack rates.
-  - 93% of respiratory panels negative.
+  - 92% of respiratory panels negative.
 - **Possible causes.** Each explanation with evidence for and against, in plain language with its weight. Nothing is a black box.
 - **Detection & algorithms.**
   - Which of the 13 methods fired.
@@ -93,7 +94,7 @@ What the pilot looks like:
 - **"Is this real data?"** No. It is a statistically realistic simulation of a 203,000-person city. It is delivered in the same formats real institutions use, and processed by the same code that would process real data.
 - **"Do you send data to an AI company?"** No. The detection and reasoning are statistical methods running on this server. An optional language model, for plain-language summaries only, must also run in-country.
 - **"How many false alarms?"** Show the evaluation table on Learning & model.
-  - In the demo period, one chance respiratory blip in Ironworks and Southbank crossed the 50% notification threshold for one day (18 September, 51%), then fell back below 1%.
-  - Every other chance signal stayed on the watch list.
-  - Feedback tightens noisy alert types.
+  - In the demo period, none of the 8 chance signals was notified. They stayed on the watch list.
+  - A notification needs 50% confidence on two consecutive days, or 80% with more than one institution seeing the rise.
+  - Be candid: when the replay starts earlier, around the return to school, some false alarms are notified. Feedback tightens noisy alert types.
 - **"What does it cost to run?"** A city pilot runs on a single server. National scale is regional instances on in-country infrastructure.

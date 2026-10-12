@@ -12,7 +12,7 @@ make serve       # http://127.0.0.1:8000  (users: minister / epi / steward / aud
 make test
 ```
 
-`make demo-live` stops the clock at 2026-09-10, before any alert, so you can press **Next day** (or **Advance 7 days** on the Demo control page) during a presentation and watch the agent find the outbreaks.
+`make demo-live` stops the clock at 2026-09-14, the last day of the historical back-fill and before any alert, so you can press **Next day** (or **Advance 7 days** on the Demo control page) during a presentation and watch the agent find the outbreaks.
 
 ## Container
 
@@ -45,6 +45,7 @@ Environment overrides: `SHIELD_DATA_DIR`, `SHIELD_ENV`, `SHIELD_CONFIG`, `SHIELD
 
 1. **Reference data.**
    - Load census population by neighbourhood, age band and sex.
+   - Load national holidays and the school/university academic calendar (`kv` keys `holidays` and `academic_breaks`).
    - Load neighbourhood boundaries and the postcode-to-neighbourhood lookup, and the school and university list.
    - The demo loads these from `shield/synth/city.py` through `shield/reference.py`. Write the same tables from the national statistics office's files.
 2. **Register each institution** in `sources` and issue it a credential. Production uses mTLS certificates.

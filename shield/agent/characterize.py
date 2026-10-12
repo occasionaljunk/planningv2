@@ -69,7 +69,7 @@ def characterize(e: CandidateEvent, data: AnalysisData, det, exclude_nbs: set | 
     base = ev.iloc[base_rows]
     # epidemic curve against the model baseline for the exact case definition
     y = np.bincount(data.a_day[base_mask], minlength=T + 1)[:T + 1].astype(float)
-    reg = temporal.regression_detector(y, data.t, data.dow, data.holiday, T, alpha=0.01, doy=data.doy, year=data.year)
+    reg = temporal.regression_detector(y, data.t, data.dow, data.holiday, T, alpha=0.01, doy=data.doy, year=data.year, term=data.term)
     show = 56
     d0 = T - show + 1
     if reg is not None:
@@ -211,7 +211,7 @@ def characterize(e: CandidateEvent, data: AnalysisData, det, exclude_nbs: set | 
         if top_nbs:
             other = smask & np.isin(data.a_nb, top_nbs) & ~pmask
             y2 = np.bincount(data.a_day[other], minlength=T + 1)[:T + 1].astype(float)
-            reg2 = temporal.regression_detector(y2, data.t, data.dow, data.holiday, T, alpha=0.01, doy=data.doy, year=data.year)
+            reg2 = temporal.regression_detector(y2, data.t, data.dow, data.holiday, T, alpha=0.01, doy=data.doy, year=data.year, term=data.term)
             if reg2 is not None:
                 o2, e2 = float(y2[T - 6:T + 1].sum()), float(reg2.expected[-7:].sum())
                 p2 = float(temporal.nb_sf(o2, e2, reg2.phi))

@@ -60,7 +60,7 @@ make serve    # open http://127.0.0.1:8000
 The password for all demo users is `shield-demo`.
 
 **Other commands:**
-- `make demo-live` stops the clock on 10 September 2026, before any alert, so you can press **Next day** in front of an audience and watch the outbreaks appear.
+- `make demo-live` stops the clock on 14 September 2026, the last day of the historical back-fill and before any alert, so you can press **Next day** in front of an audience and watch the outbreaks appear.
 - `make test` runs the test suite.
 - `make evaluate` scores the agent against the simulation's ground truth.
 - `make check` runs the sovereignty checks.
@@ -86,11 +86,11 @@ On top of that background, five events are injected. The agent never sees which:
 
 | Simulated event | What the agent did |
 |---|---|
-| **Measles** among under-vaccinated children, February-April 2024 (historical) | Alerted on 11 March 2024 from measles diagnoses and positive IgM tests. The demo includes the epidemiologist's feedback from that time, so it appears as local history. |
-| **Novel respiratory pathogen** introduced at Riverton State University, 6 September 2026. Standard lab panels are negative, as they were for SARS-CoV-2 in December 2019. | Alerted on 15 September, nine days after introduction, at the university, already as **"novel or emerging respiratory pathogen"** because the respiratory panels were negative. The alert tracked doubling time, Rt and spread to Harbour College and Old Harbour. P1. |
+| **Measles** among under-vaccinated children, February-April 2024 (historical) | Alerted on 18 March 2024 from measles diagnoses and positive IgM tests. The demo includes the epidemiologist's feedback from that time, so it appears as local history. |
+| **Novel respiratory pathogen** introduced at Riverton State University, 6 September 2026. Standard lab panels are negative, as they were for SARS-CoV-2 in December 2019. | Alerted on 15 September at the university, nine days after introduction, when 13 patients had sought care. At first it read as a possible COVID-19 wave. From 22 September, as respiratory panels kept coming back negative, the same alert's leading explanation became **"novel or emerging respiratory pathogen"**, with doubling time, Rt and spread to Harbour College and Old Harbour. P1. |
 | **Norovirus** point-source outbreak at Northgate Primary School, 22 September 2026 | Alerted on 24 September, the day after the first children sought care, with norovirus-positive stool tests. |
 | **Legionnaires' disease** from a cooling tower in Ironworks, exposures from 24 September 2026 | Alerted on 6 October as a severe-pneumonia cluster in older adults, with positive Legionella urinary antigens. Recommends cooling-tower sampling. P1. |
-| **Not an outbreak:** after an EHR upgrade, St. Mary's Medical Center codes abdominal pain as infectious gastroenteritis (from 1 October 2026) | Recognised as a **probable data artefact**: one source, a sudden shift in code A09, triage text that does not match, no other institution affected. Kept on the watch list and not notified. |
+| **Not an outbreak:** after an EHR upgrade, St. Mary's Medical Center codes abdominal pain as infectious gastroenteritis (from 1 October 2026) | At first it looked like a gastrointestinal rise. Within three days it was re-explained as a **probable data artefact**: one source, a sudden shift in code A09, triage text that does not match, and no other institution affected. It stayed on the watch list and was never notified. |
 
 Exact dates and numbers are in [Validation results](#validation-results).
 
@@ -122,7 +122,10 @@ The agent is a fixed, auditable sequence of steps. Each run stores a trace that 
 6. **Score confidence** with a logistic model over 12 interpretable features. It starts from expert weights and is **re-trained from government feedback**.
 7. **Assess biases:** coverage gaps, reporting delay, testing bias, single-source dependence, small numbers, multiple testing, care-seeking differences, coding quality and model assumptions. Each is quantified where possible.
 8. **Add historical context.** Comparable outbreaks (1918, 2009 H1N1, SARS, MERS, COVID-19, Milwaukee 1993, Germany 2011 E. coli, South Bronx 2015 Legionnaires', Samoa 2019 measles, norovirus burden, Ebola 2014-16) with published cases, hospitalisations, deaths, economic and social impact, and sources. Published rates are scaled to the affected population.
-9. **Brief and notify.** Title, summary, key findings and recommended next steps. Alerts are updated day by day as evidence changes. Notifications go to the in-app inbox and optional in-country webhooks.
+9. **Brief and notify.** Title, summary, key findings and recommended next steps. Alerts are updated day by day as evidence changes.
+   - **When it notifies:** confidence must reach 50% on two consecutive days. Confidence of 80% or more notifies immediately if more than one institution sees the rise. A notifiable diagnosis notifies immediately.
+   - **Below that:** signals stay on a watch list for analysts.
+   - **Channels:** the in-app inbox and optional in-country webhooks.
 
 **About the "AI".** Detection and reasoning are statistical and Bayesian, not a large language model. This is deliberate:
 - These are the methods public-health agencies already validate and trust.
@@ -153,27 +156,27 @@ What production adds: government identity provider with MFA, in-country HSM/KMS,
 
 ## Validation results
 
-Produced by `make evaluate` after `make demo`. Every row is computed by comparing the agent's alerts with the simulation's ground truth, which the agent never reads. The data reached the platform through the connectors, day by day.
+Produced by `make evaluate` after `make demo`. Every row compares the agent's alerts with the simulation's ground truth, which the agent never reads. All data reached the platform through the connectors, day by day.
 
-| Scenario | Started | First alert | First notified | Days from start | Leading explanation at first alert | Final explanation | Final confidence |
+| Scenario | Started | First patient sought care | First alert | First notified | Leading explanation at first alert | Final explanation | Final confidence |
 |---|---|---|---|---|---|---|---|
-| Measles outbreak among under-vaccinated children | 2024-02-26 | 2024-03-11 | 2024-03-18 | 14 | Measles | Measles | 91% |
-| Novel respiratory pathogen introduced at a university | 2026-09-06 | 2026-09-15 | 2026-09-15 | 9 | Novel or emerging respiratory pathogen | Novel or emerging respiratory pathogen | 100% |
-| Norovirus outbreak at Northgate Primary School | 2026-09-22 | 2026-09-24 | 2026-09-24 | 2 | Norovirus gastroenteritis | Norovirus gastroenteritis | 97% |
-| Legionnaires' disease cluster linked to a cooling tower | 2026-09-24 | 2026-10-06 | 2026-10-06 | 12 | Legionnaires' disease (environmental source) | Legionnaires' disease (environmental source) | 92% |
-| EHR upgrade coding artefact (not a real outbreak) | 2026-10-01 | 2026-10-01 | not notified | 0 | Norovirus gastroenteritis | Data or coding artefact (not a real increase in illness) | 12% |
+| Measles outbreak among under-vaccinated children | 2024-02-26 | 2024-03-01 | 2024-03-18 | historical run (notifications off) | Measles | Measles | 90% |
+| Novel respiratory pathogen introduced at a university | 2026-09-06 | 2026-09-12 | 2026-09-15 | 2026-09-15 | COVID-19 (SARS-CoV-2) wave | Novel or emerging respiratory pathogen | 100% |
+| Norovirus outbreak at Northgate Primary School | 2026-09-22 | 2026-09-23 | 2026-09-24 | 2026-09-24 | Norovirus gastroenteritis | Norovirus gastroenteritis | 99% |
+| Legionnaires' disease cluster linked to a cooling tower | 2026-09-24 | 2026-09-28 | 2026-10-06 | 2026-10-06 | Legionnaires' disease (environmental source) | Legionnaires' disease (environmental source) | 97% |
+| EHR upgrade coding artefact (not a real outbreak) | 2026-10-01 | 2026-10-01 | 2026-10-01 | not notified | Norovirus gastroenteritis | Data or coding artefact (not a real increase in illness) | 50% |
 
-**False alarms.** 6 of 13 alerts did not correspond to a simulated event; 1 of those was ever notified (it crossed the threshold on one day before falling back); the rest stayed on the watch list.
+**False alarms.** 8 of 14 alerts did not correspond to a simulated event; 0 of those were notified; the rest stayed on the watch list. Watch-list items are visible to analysts but do not trigger notifications.
 
 **How to read this:**
-- "Days from start" counts from the first infection or exposure. Many patients had not yet sought care, so this is a demanding measure.
-- **Novel pathogen.** Flagged 9 days after it was introduced, when only 13 patients had seen a doctor. The first visit was 3 days earlier.
-- **Norovirus.** Flagged the day after the first children presented.
-- **Legionnaires'.** Flagged 8 days after the first patient presented, once 15 cases, admissions and positive urinary antigens had accumulated.
-- **Coding artefact.** It first looked like a gastrointestinal rise. Within the alert it was re-explained as a data artefact and was never notified.
-- The notification threshold is 50% confidence. Weak signals below it stay on the watch list for analysts.
+- **Novel pathogen.** Alerted 9 days after introduction, when 13 patients had sought care. Its first visit was on 2026-09-12. The leading explanation started as "COVID-19 (SARS-CoV-2) wave" and became "Novel or emerging respiratory pathogen" as negative laboratory panels accumulated.
+- **Norovirus.** Alerted 1 day after the first children sought care.
+- **Legionnaires'.** Alerted 8 days after the first patient presented, once 15 cases, admissions and positive urinary antigens had accumulated.
+- **Measles.** Alerted 17 days after the first case presented, from measles diagnoses and IgM results.
+- **Coding artefact.** It first looked like a gastrointestinal rise (Norovirus gastroenteritis). It was re-explained as a data artefact on 2026-10-04, and was never notified.
+- **Notification rule.** Confidence must be at least 50% on two consecutive days. At 80% or more, an alert notifies immediately if more than one institution sees the rise. A notifiable diagnosis also notifies immediately.
 
-**Limitation.** These are results on simulated data, with parameters tuned on the same simulation. Real-world performance must be measured during a silent-running pilot.
+**Limitation.** These results come from one simulated scenario set. The parameters were tuned on the same simulator. In testing before the final notification rule was added, starting the replay earlier (10 September) produced several notified false alarms around the return to school. That start date has not been re-tested since. Real-world sensitivity and false-alarm rates must be measured during a silent-running pilot with local feedback.
 
 ---
 

@@ -166,7 +166,7 @@ def api_overview(user: User = Depends(require("view_dashboard"))):
         nb["syndromes"]["ARI"] = {"ratio": round(ari_recent, 2)}
     level_counts = {}
     for a in alerts:
-        if a["confidence"] >= get_settings().notify_min_confidence:
+        if a["notified"]:
             level_counts[a["level"]] = level_counts.get(a["level"], 0) + 1
     audit.record(user.name, user.role, "view.overview", "dashboard", {})
     return {
@@ -174,8 +174,8 @@ def api_overview(user: User = Depends(require("view_dashboard"))):
         "kpis": {"records_total": total, "records_24h": last24, "labs_24h": labs24, "population_covered": pop,
                  "sources_online": sum(1 for s in srcs if s["status"] == "online"), "sources_total": len(srcs),
                  "alerts_by_level": level_counts,
-                 "active_alerts": sum(1 for a in alerts if a["confidence"] >= get_settings().notify_min_confidence),
-                 "watch_list": sum(1 for a in alerts if a["confidence"] < get_settings().notify_min_confidence)},
+                 "active_alerts": sum(1 for a in alerts if a["notified"]),
+                 "watch_list": sum(1 for a in alerts if not a["notified"])},
         "trend": {"dates": dates, "series": series},
         "alerts": [dict(a) for a in alerts],
         "map": list(nbmap.values()),
@@ -215,7 +215,7 @@ def api_alerts(status: str | None = None, user: User = Depends(require("view_das
     fb = {r[0]: r[1] for r in con.execute("SELECT alert_id, verdict FROM feedback ORDER BY id")}
     for r in rows:
         r["feedback_verdict"] = fb.get(r["id"])
-        r["watch_only"] = r["confidence"] < get_settings().notify_min_confidence
+        r["watch_only"] = not r["notified"]
     return rows
 
 

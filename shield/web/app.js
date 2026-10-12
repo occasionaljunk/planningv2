@@ -181,7 +181,7 @@
       <div class="grid g-main section">
         <div class="card"><div class="row between"><h2>Alerts needing attention</h2><a href="#/alerts">All alerts →</a></div>
           ${act.length ? act.map(alertCard).join("") : '<div class="empty">No alerts above the notification threshold.</div>'}
-          ${watch.length ? `<details class="watch section"><summary class="secondary">Watch list (${watch.length}): low-confidence signals kept under review</summary><div class="section">${watch.map(alertCard).join("")}</div></details>` : ""}
+          ${watch.length ? `<details class="watch section"><summary class="secondary">Watch list (${watch.length}): signals kept under review, not notified</summary><div class="section">${watch.map(alertCard).join("")}</div></details>` : ""}
         </div>
         <div class="card"><div class="row between"><h2>Where: last 7 days vs usual</h2></div>
           <div class="chips" id="mapchips">${["ARI", "GI", "FEVER", "RASH", "NEURO"].map((s) => `<button class="chip ${s === mapSyn ? "on" : ""}" data-s="${s}">${SYN_LABEL[s]}</button>`).join("")}</div>
@@ -227,7 +227,7 @@
         </tbody></table></div>` : '<div class="empty">No alerts.</div>';
       v.querySelectorAll("tr.click").forEach((r) => r.addEventListener("click", () => (location.hash = "#/alert/" + r.dataset.id)));
     };
-    v.innerHTML = `<h1>Alerts</h1><p class="secondary">Every event the agent has assessed. Alerts below ${pct(0.5)} confidence stay on the watch list and are not notified.</p>
+    v.innerHTML = `<h1>Alerts</h1><p class="secondary">Every event the agent has assessed. Alerts are notified when confidence reaches ${pct(0.5)} on two consecutive days (immediately at 80% when several institutions see it, or for a notifiable diagnosis); everything else stays on the watch list.</p>
       <div class="chips section" id="fch">${["open", "new", "investigating", "closed", "all"].map((f) => `<button class="chip ${f === filter ? "on" : ""}" data-f="${f}">${f}</button>`).join("")}</div>
       <div class="card section" id="tbl"></div>`;
     v.querySelectorAll("#fch .chip").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; v.querySelectorAll("#fch .chip").forEach((x) => x.classList.toggle("on", x === b)); draw(); }));

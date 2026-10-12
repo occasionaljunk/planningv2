@@ -90,7 +90,7 @@ def run_detection(data: AnalysisData, alpha: float = 0.01, fdr_q: float = 0.05, 
                 if y[max(0, T - 365):T + 1].sum() < 15 or recent < 3:
                     continue
                 n_series += 1
-                reg = temporal.regression_detector(y, data.t, data.dow, data.holiday, T, alpha=a, doy=data.doy, year=data.year)
+                reg = temporal.regression_detector(y, data.t, data.dow, data.holiday, T, alpha=a, doy=data.doy, year=data.year, term=data.term)
                 far = temporal.farrington_flexible(y, T, alpha=a)
                 base_mean = y[T - 34:T - 6].mean()
                 ear = temporal.ears(y, T) if base_mean >= 1.0 else {}
@@ -224,7 +224,7 @@ def lab_signals(data: AnalysisData, alpha: float) -> list[Signal]:
         if y[T - 6:T + 1].sum() < 3:
             continue
         reg = temporal.regression_detector(y, data.t, data.dow, data.holiday, T, alpha=alpha, min_history=56,
-                                           doy=data.doy, year=data.year)
+                                           doy=data.doy, year=data.year, term=data.term)
         base_rate = y[max(0, T - 379):T - 13].mean()
         r7 = reg.result7 if (reg is not None and base_rate >= 0.5) else temporal.rare_event_test(y, T, alpha)
         if r7.alarm:
@@ -245,7 +245,7 @@ def lab_signals(data: AnalysisData, alpha: float) -> list[Signal]:
         tot = np.bincount(per_order["day"].clip(0, T).values, minlength=n_days)[:n_days].astype(float)
         neg = np.bincount(per_order.loc[per_order["neg"], "day"].clip(0, T).values, minlength=n_days)[:n_days].astype(float)
         reg = temporal.regression_detector(neg, data.t, data.dow, data.holiday, T, alpha=alpha, min_history=56,
-                                           doy=data.doy, year=data.year)
+                                           doy=data.doy, year=data.year, term=data.term)
         n7, t7 = neg[T - 6:T + 1].sum(), tot[T - 6:T + 1].sum()
         nb_, tb_ = neg[T - 34:T - 6].sum(), tot[T - 34:T - 6].sum()
         if reg is not None and t7 >= 10 and tb_ > 0:

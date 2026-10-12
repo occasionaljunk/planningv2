@@ -21,17 +21,19 @@ def _fmt_p(p: float) -> str:
     return "<0.001" if p < 0.001 else f"{p:.3f}"
 
 
-def title(ch: dict, hyps: list[dict]) -> str:
+def title(ch: dict, hyps: list[dict], confidence: float = 0.0) -> str:
     top = hyps[0] if hyps else None
     syn = ch["case_syndrome_label"]
     place = ch["place"]
     if top and top["id"] == "reporting_artefact" and top["probability"] >= 0.4:
         return f"Probable data artefact: apparent rise in {syn} at {place}"
     if top and top["id"] == "chance" and top["probability"] >= 0.4:
-        return f"Possible chance fluctuation: {syn} in {place}"
+        if confidence < 0.5:
+            return f"Possible chance fluctuation: {syn} in {place}"
+        return f"Unexplained increase in {syn}: {place}"
     if ch["family"] == "MORTALITY":
         return f"Excess deaths: {place}"
-    lead = top["name"] if top and top["probability"] >= 0.35 else "Unexplained increase"
+    lead = top["name"] if top and top["probability"] >= 0.35 and top["id"] != "chance" else "Unexplained increase"
     shape = "cluster" if ch["kind"] == "locus" else "increase"
     return f"{lead} suspected: {syn} {shape} in {place}" if lead != "Unexplained increase" else \
         f"Unexplained {shape} in {syn}: {place}"

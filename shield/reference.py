@@ -51,5 +51,6 @@ def load_city_reference(persons: pd.DataFrame | None = None) -> dict[str, str]:
                      s["neighbourhood_id"], 1, hashlib.sha256(key.encode()).hexdigest(), notes))
     con.commit()
     kv_set("holidays", ["01-01", "05-01", "08-15", "12-25", "12-26"])
+    kv_set("academic_breaks", [["06-20", "08-25"], ["12-20", "01-05"]])
     kv_set("jurisdiction", {"name": "City of Riverton", "population": int(len(persons)) if persons is not None else None})
     return keys

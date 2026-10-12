@@ -45,7 +45,7 @@ def evaluate(write: bool = True) -> dict:
             first = min(hits, key=lambda a: a["first_as_of"])
             hist = json.loads(first["history"])
             hist = [h for h in hist if "confidence" in h]
-            notified = [h for h in hist if h["confidence"] >= notify]
+            notified = [h for h in hist if h["confidence"] >= notify] if first["notified"] else []
             row.update({"first_alert": first["first_as_of"],
                         "first_notified": notified[0]["as_of"] if notified else None,
                         "days_to_detect": (date.fromisoformat(first["first_as_of"]) - date.fromisoformat(ob["start"])).days,
@@ -67,10 +67,9 @@ def evaluate(write: bool = True) -> dict:
         "of_which_notified": len(unmatched_notified),
         "notified_titles": [a["title"] for a in unmatched_notified],
         "unmatched_titles": [a["title"] for a in unmatched],
-        "false_alarm_summary": f"{len(unmatched)} of {len(alerts)} alerts did not correspond to a simulated event; "
-                               f"{len(unmatched_notified)} of those was ever notified (it crossed the threshold on one day before "
-                               "falling back); the rest stayed on the watch list." if len(unmatched_notified) == 1 else
-                               f"{len(unmatched_notified)} of those were ever notified; the rest stayed on the watch list.",
+        "false_alarm_summary": (f"{len(unmatched)} of {len(alerts)} alerts did not correspond to a simulated event; "
+                                f"{len(unmatched_notified)} of those {'was' if len(unmatched_notified) == 1 else 'were'} "
+                                "notified; the rest stayed on the watch list."),
     }
     if write:
         (get_settings().data_dir / "evaluation.json").write_text(json.dumps(out, indent=1))

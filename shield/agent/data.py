@@ -34,6 +34,8 @@ SYNDROME_LABEL = {
 FAMILY_LABEL = {"RESPIRATORY": "Respiratory", "GI": "Gastrointestinal", "FEVER": "Febrile", "RASH": "Fever & rash",
                 "NEURO": "Neurological", "MORTALITY": "Mortality"}
 DEFAULT_HOLIDAYS = ["01-01", "05-01", "08-15", "12-25", "12-26"]
+# School/university breaks as (start MM-DD, end MM-DD); configured per jurisdiction from the academic calendar
+DEFAULT_BREAKS = [["06-20", "08-25"], ["12-20", "01-05"]]
 
 
 @dataclass
@@ -170,7 +172,28 @@ class AnalysisData:
         self.year = self.days.year.values
         hol = set(self.ref.holidays)
         self.holiday = np.array([d.strftime("%m-%d") in hol for d in self.days])
+        self.term = self._term_covariates()
         self.t = np.arange(self.T + 1, dtype=float)
+
+    def _term_covariates(self) -> np.ndarray:
+        from ..db import kv_get
+        breaks = kv_get("academic_breaks", DEFAULT_BREAKS, self.con)
+        md = np.array([d.strftime("%m-%d") for d in self.days])
+        in_break = np.zeros(len(md), bool)
+        for a, b in breaks:
+            in_break |= ((md >= a) & (md <= b)) if a <= b else ((md >= a) | (md <= b))
+        in_term = (~in_break).astype(float)
+        # days since the most recent return from a break, as a decaying "back-to-school" effect
+        since = np.full(len(md), 999.0)
+        last = None
+        for i, br in enumerate(in_break):
+            if br:
+                last = None
+            else:
+                last = i if last is None else last
+                since[i] = i - last
+        back = np.where(since < 999, np.exp(-since / 14.0), 0.0)
+        return np.column_stack([in_term, back])
 
     # ------------------------------------------------------------------ masks and matrices
     def syndrome_mask(self, syn: str) -> np.ndarray:

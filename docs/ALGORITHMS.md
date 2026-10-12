@@ -14,7 +14,7 @@ Shield AI uses the statistical methods that public-health agencies already trust
 
 | Method | What it catches | Notes |
 |---|---|---|
-| **Robust quasi-Poisson regression** | Daily and 7-day excess against an expectation | Covariates: trend, annual harmonics, day of week, holidays, and a leave-one-year-out same-season profile, which captures back-to-school rises. Fitted on up to 2 years that end before the 14-day assessment window, so a current outbreak cannot hide in its own baseline. Past outbreaks are down-weighted with Anscombe residuals. Thresholds come from the negative-binomial quantile with estimated over-dispersion. |
+| **Robust quasi-Poisson regression** | Daily and 7-day excess against an expectation | **Covariates:** annual harmonics, day of week, holidays, the academic calendar (an in-term indicator and a decaying back-to-school effect), and a leave-one-year-out same-season profile. **Training:** up to 2 years, ending before the 14-day assessment window, so a current outbreak cannot hide in its own baseline. **Level:** recalibrated to the last 4 weeks of training data, instead of a linear trend that one severe season could tilt. **Robustness:** past outbreaks are down-weighted with Anscombe residuals. **Thresholds:** negative-binomial quantile with estimated over-dispersion. |
 | **Farrington Flexible** (Noufaily et al. 2013) | Weekly excess against the same season in up to 3 previous years | The standard at UKHSA and many European agencies. It uses a 10-period seasonal factor, a trend only when significant, re-weighting of past outbreaks, and a negative-binomial threshold. It needs more than 5 cases in 4 weeks. |
 | **EARS C1/C2/C3** (CDC) | Sharp onsets against a 7-day baseline | Used only for series averaging at least 1 a day, and only together with CUSUM and a supporting regression p-value. On their own they are noisy. |
 | **CUSUM** | Small, sustained increases | Runs on standardised regression residuals (k = 0.5, h = 4). |
@@ -70,7 +70,15 @@ Shield AI uses the statistical methods that public-health agencies already trust
   - local cause priors;
   - local history, which is cited in future alerts.
 
-## 9. Historical context (`shield/agent/history.py`, `knowledge/historical_epidemics.json`)
+## 9. Notification policy
+
+- **Persistence rule.** An alert is notified when its confidence is at least 50% on two consecutive daily assessments.
+- **Immediate notification.** At 80% confidence or more, if more than one institution sees the rise, notification is immediate. A notifiable diagnosis recorded by clinicians also notifies immediately.
+- **Single-source rises.** A rise seen by only one institution must always persist for a second day, because one source can change its systems.
+- **Watch list.** Everything else stays on a watch list.
+- **Why.** Operational syndromic-surveillance teams use similar persistence rules. They cut one-day statistical blips without delaying strong signals.
+
+## 10. Historical context (`shield/agent/history.py`, `knowledge/historical_epidemics.json`)
 
 - **Matching:** past outbreaks are matched to the leading explanations.
 - **Content:** published cases, hospitalisations, deaths, economic and social impact, and lessons, each with sources.

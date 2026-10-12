@@ -7,7 +7,7 @@ demo:            ## build the simulated city and replay to 2026-10-10 (about 10-
 	python3 -m shield.cli seed
 
 demo-live:       ## seed and stop before the first alert, to advance live during a presentation
-	python3 -m shield.cli seed --backfill-end 2026-09-10 --clock 2026-09-10
+	python3 -m shield.cli seed --clock 2026-09-14
 
 serve:
 	python3 -m shield.cli serve --host 127.0.0.1 --port 8000

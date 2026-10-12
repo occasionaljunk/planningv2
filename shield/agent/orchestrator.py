@@ -210,7 +210,7 @@ def run_agent(as_of: date, actor: str = "agent", notify: bool = True) -> dict:
         aff_pop = int(sum(data.ref.pop_by_nb()[g["id"]] for g in ch["geography"][:3])) if ch["geography"] else city_pop
         hist = history.context(hyps, ch, aff_pop, city_pop)
         sigs = [x.summary() for x in e.signals]
-        title = narrative.title(ch, hyps)
+        title = narrative.title(ch, hyps, p)
         report = {
             "title": title, "as_of": as_of.isoformat(), "family": ch["family"], "family_label": ch["family_label"],
             "summary": narrative.summary(ch, hyps, p, lvl),
@@ -256,6 +256,23 @@ def _loci(rep: dict) -> set:
     out = {f"nb:{g['id']}" for g in ch.get("geography", [])[:3]}
     out |= {f"inst:{i['id']}" for i in ch.get("institutions", []) if (i.get("relative_risk") or 0) >= 2}
     return out
+
+
+def _notify_rule(rep: dict, previous: list, threshold: float) -> bool:
+    """Notify when confidence reaches the threshold on two consecutive daily assessments, or immediately when
+    confidence is very high (>= 0.8) and more than one institution sees the rise, or when clinicians recorded a
+    notifiable diagnosis. One-day blips and single-source rises stay on the watch list until they persist."""
+    p = rep["confidence"]["value"]
+    ch = rep["characterisation"]
+    if p < threshold:
+        return False
+    if ch.get("notifiable"):
+        return True
+    single_source = ch.get("kind") == "facility" or ch.get("n_sources_with_excess", 0) <= 1
+    if p >= 0.8 and not single_source:
+        return True
+    # one-day blips, and anything seen by a single institution, must persist for a second day
+    return bool(previous) and previous[-1].get("confidence", 0) >= threshold
 
 
 def persist(reports, as_of: date, tr: Trace, do_notify: bool) -> tuple[int, int]:
@@ -329,7 +346,7 @@ def persist(reports, as_of: date, tr: Trace, do_notify: bool) -> tuple[int, int]
                              rep["priority"], json.dumps(rep, default=str), json.dumps(hist), aid))
                 upd += 1
                 notified = any(m["notified"] for m in matches)
-                should_notify = (not notified) and rep["confidence"]["value"] >= s.notify_min_confidence
+                should_notify = (not notified) and _notify_rule(rep, hist[:-1], s.notify_min_confidence)
                 if notified:
                     con.execute("UPDATE alerts SET notified=1 WHERE id=?", (aid,))
             else:
@@ -342,7 +359,7 @@ def persist(reports, as_of: date, tr: Trace, do_notify: bool) -> tuple[int, int]
                 aid = cur.lastrowid
                 claimed.add(aid)
                 new += 1
-                should_notify = rep["confidence"]["value"] >= s.notify_min_confidence
+                should_notify = _notify_rule(rep, [], s.notify_min_confidence)
             con.execute("DELETE FROM alert_cases WHERE alert_id=?", (aid,))
             con.executemany("INSERT OR IGNORE INTO alert_cases(alert_id, event_id) VALUES (?,?)", [(aid, int(i)) for i in ids])
             con.commit()
