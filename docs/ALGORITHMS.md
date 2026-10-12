@@ -60,7 +60,9 @@ Shield AI uses the statistical methods that public-health agencies already trust
 
 ## 8. Confidence and learning (`shield/agent/confidence.py`, `feedback.py`)
 
-- **Model:** a logistic model over 9 interpretable features: statistical strength, agreement between detector families, number of corroborating institutions, laboratory support, persistence, size, growth, single-source concentration (negative weight) and coding anomaly (negative weight).
+- **Model:** a logistic model over 12 interpretable features.
+  - Raise confidence: statistical strength, agreement between detector families, number of institutions with a statistically meaningful excess, laboratory support, persistence, size, growth, the event's own significance, and relative increase.
+  - Lower confidence: single-source concentration, coding anomaly, and the differential's probabilities of chance variation and of a data artefact.
 - **Training:** it starts from expert weights. After every piece of feedback it is re-fitted as maximum a posteriori with a Gaussian prior around those weights, so a few local examples adjust it without destabilising it.
 - **Feedback also updates:**
   - per-detector positive predictive value (Beta-Binomial);

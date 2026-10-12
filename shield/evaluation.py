@@ -24,7 +24,7 @@ def evaluate(write: bool = True) -> dict:
     rec_by_outbreak: dict[str, set] = {}
     for r in truth["records"]:
         rec_by_outbreak.setdefault(r["truth_outbreak"], set()).add(r["encounter_id"])
-    alerts = con.execute("SELECT id, title, first_as_of, history, confidence, top_hypothesis, report FROM alerts").fetchall()
+    alerts = con.execute("SELECT id, title, first_as_of, history, confidence, top_hypothesis, report, notified FROM alerts").fetchall()
     alert_enc = {}
     for a in alerts:
         alert_enc[a["id"]] = {r[0] for r in con.execute(
@@ -33,9 +33,12 @@ def evaluate(write: bool = True) -> dict:
     scenarios, matched_alerts = [], set()
     for ob in truth["outbreaks"]:
         recs = rec_by_outbreak.get(ob["id"], set())
-        hits = [a for a in alerts if recs and len(alert_enc[a["id"]] & recs) >= 3]
+        def hit(a):
+            ov = len(alert_enc[a["id"]] & recs)
+            return ov >= 3 and (ov / max(len(alert_enc[a["id"]]), 1) >= 0.1 or ov / max(len(recs), 1) >= 0.25)
+        hits = [a for a in alerts if recs and hit(a)]
         if ob["id"] == "coding_artefact_2026":
-            hits = [a for a in alerts if a["top_hypothesis"] == "reporting_artefact" or len(alert_enc[a["id"]] & recs) >= 3]
+            hits = [a for a in alerts if a["top_hypothesis"] == "reporting_artefact" or hit(a)]
         matched_alerts |= {a["id"] for a in hits}
         row = {"id": ob["id"], "name": ob["name"], "start": ob["start"], "expected": ob.get("hypothesis")}
         if hits:
@@ -54,18 +57,20 @@ def evaluate(write: bool = True) -> dict:
             row.update({"first_alert": None, "days_to_detect": None, "correct_cause": False})
         scenarios.append(row)
     unmatched = [a for a in alerts if a["id"] not in matched_alerts]
-    unmatched_notified = [a for a in unmatched if a["confidence"] >= notify]
+    unmatched_notified = [a for a in unmatched if a["notified"]]
     out = {
         "description": "Agent alerts compared with the simulated ground truth (the agent never reads it). "
                        "'Days to detect' counts from the start of the simulated outbreak or exposure, before most "
                        "patients had even sought care.",
         "scenarios": scenarios,
         "alerts_total": len(alerts), "alerts_not_matching_any_scenario": len(unmatched),
-        "of_which_above_notification_threshold": len(unmatched_notified),
+        "of_which_notified": len(unmatched_notified),
+        "notified_titles": [a["title"] for a in unmatched_notified],
         "unmatched_titles": [a["title"] for a in unmatched],
         "false_alarm_summary": f"{len(unmatched)} of {len(alerts)} alerts did not correspond to a simulated event; "
-                               f"{len(unmatched_notified)} of those reached the notification threshold (the rest stayed "
-                               "on the watch list).",
+                               f"{len(unmatched_notified)} of those was ever notified (it crossed the threshold on one day before "
+                               "falling back); the rest stayed on the watch list." if len(unmatched_notified) == 1 else
+                               f"{len(unmatched_notified)} of those were ever notified; the rest stayed on the watch list.",
     }
     if write:
         (get_settings().data_dir / "evaluation.json").write_text(json.dumps(out, indent=1))

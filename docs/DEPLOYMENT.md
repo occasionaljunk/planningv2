@@ -7,12 +7,12 @@ Requirements: Python 3.11+, about 1.5 GB free disk and about 4 GB RAM.
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
-make demo        # builds Riverton, back-fills history, replays 26 days through the connectors (about 6-8 minutes)
+make demo        # builds Riverton, back-fills history, replays 26 days through the connectors (about 10-15 minutes)
 make serve       # http://127.0.0.1:8000  (users: minister / epi / steward / auditor, password shield-demo)
 make test
 ```
 
-`make demo-live` stops the clock at 2026-09-20, before the outbreaks are visible, so you can press **Next day** during a presentation and watch the agent find them.
+`make demo-live` stops the clock at 2026-09-10, before any alert, so you can press **Next day** (or **Advance 7 days** on the Demo control page) during a presentation and watch the agent find the outbreaks.
 
 ## Container
 

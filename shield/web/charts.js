@@ -171,7 +171,8 @@
       const x0 = r.value >= 0 ? zero : zero - w;
       const color = r.color || (r.value >= 0 ? css("--div-neg") : css("--div-pos"));
       el("rect", { x: x0, y: y0 + 2, width: Math.max(w, 1), height: 14, rx: 3, fill: color }, svg);
-      const vt = el("text", { x: r.value >= 0 ? zero + w + 6 : x0 - 6, y: y0 + 13, "text-anchor": r.value >= 0 ? "start" : "end", fill: css("--text-primary"), "font-size": 12 }, svg);
+      // negative values are labelled just right of the zero line so they never collide with row labels
+      const vt = el("text", { x: r.value >= 0 ? zero + w + 6 : zero + 6, y: y0 + 13, "text-anchor": "start", fill: css("--text-primary"), "font-size": 12 }, svg);
       vt.textContent = r.display ?? fmt(r.value);
       const hit = el("rect", { x: 0, y: y0, width: W, height: rowH, fill: "transparent" }, svg);
       hit.addEventListener("mousemove", (evt) => showTip(evt, `<div class="t">${esc(r.label)}</div><div>${esc(r.tip || r.display || fmt(r.value))}</div>`));

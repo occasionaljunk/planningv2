@@ -289,7 +289,8 @@ def persist(reports, as_of: date, tr: Trace, do_notify: bool) -> tuple[int, int]
                 {a_kind, ch["kind"]} <= {"locus", "citywide"}
             if ov >= 0.3 and same_kind:
                 scored.append((ov, a))
-        scored.sort(key=lambda x: (-x[0], x[1]["id"]))
+        # the oldest matching alert continues (keeps the first-detection date); others sharing cases merge into it
+        scored.sort(key=lambda x: x[1]["id"])
         new_top = rep["hypotheses"][0]["id"] if rep["hypotheses"] else None
         if scored:
             old_top = json.loads(scored[0][1]["report"])["hypotheses"][0]["id"] if json.loads(scored[0][1]["report"])["hypotheses"] else None

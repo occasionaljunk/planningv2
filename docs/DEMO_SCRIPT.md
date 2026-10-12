@@ -1,7 +1,7 @@
 # Demo script for a government audience (25-35 minutes)
 
 **Setup.**
-- Run `make demo-live` the day before. It stops the clock at 20 September 2026, before the outbreaks are obvious.
+- Run `make demo-live` the day before. It stops the clock at 10 September 2026, before any alert.
 - Run `make serve` and open http://127.0.0.1:8000.
 - Use one browser window signed in as the Health Minister and one as the Chief Epidemiologist.
 - If time is short, use `make demo` instead (clock at 10 October, all alerts already raised) and skip step 3.
@@ -27,18 +27,22 @@
 - Twelve institutions: hospitals over FHIR, clinics over HL7 v2, university clinics, the public health laboratory, two health insurers, a life insurer and the education registry.
 - **Delay column.** Hospitals report within hours; insurers take days. The platform corrects for that.
 
-**Press Next day a few times**, about 10 seconds per day. Each press does two things:
+**Advance the clock.** Use **Next day**, or **Advance 7 days** on the Demo control page. Each simulated day takes about 10-25 seconds and does two things:
 - Renders that day's real-format messages from each institution and sends them through the connectors.
 - Runs the agent.
 
 **What appears:**
-- **About 23 September: university respiratory cluster.**
-  - It first looks like ordinary respiratory illness.
-  - As laboratory panels come back negative for influenza, RSV and SARS-CoV-2, the leading explanation shifts to **novel or emerging respiratory pathogen**.
-  - Open the alert and show **How the assessment evolved**.
-- **About 25 September: school norovirus.** A gastrointestinal cluster at Northgate Primary School, with norovirus-positive stool tests.
-- **From 1 October: a hospital rise in gastrointestinal illness.** The agent calls it a **probable data artefact**, keeps it on the watch list and does not notify. Open it: one hospital, a jump in code A09, triage text saying "abd pain", and no other institution seeing it. This is the credibility moment: the system tells you when not to panic.
-- **About 7 October: Legionnaires' disease cluster in Ironworks.** Severe pneumonia in older men, Legionella urinary antigen positives, compact geography. The recommended action is to sample cooling towers.
+- **15 September: university respiratory cluster.**
+  - Only 13 patients have seen a doctor, mostly students at Riverton State University.
+  - Their respiratory panels are negative for influenza, RSV and SARS-CoV-2, so the leading explanation is already **novel or emerging respiratory pathogen**.
+  - Over the following days the same alert grows, gains a doubling time and Rt, and spreads to Harbour College and Old Harbour.
+  - Open **How the assessment evolved**.
+- **24 September: school norovirus.** A gastrointestinal cluster at Northgate Primary School the day after the first children presented, with norovirus-positive stool tests.
+- **1 October: a hospital rise in gastrointestinal illness.**
+  - Within its first days the agent explains it as a **probable data artefact**, keeps it on the watch list and does not notify.
+  - Open it: one hospital, a jump in code A09, triage text saying "abd pain", and no other institution seeing it.
+  - This is the credibility moment: the system tells you when not to panic.
+- **6 October: Legionnaires' disease cluster in Ironworks.** Severe pneumonia in older men, Legionella urinary antigen positives, compact geography. The recommended action is to sample cooling towers.
 
 ## 4. Inside one alert (8 min)
 
@@ -88,5 +92,8 @@ What the pilot looks like:
 
 - **"Is this real data?"** No. It is a statistically realistic simulation of a 203,000-person city. It is delivered in the same formats real institutions use, and processed by the same code that would process real data.
 - **"Do you send data to an AI company?"** No. The detection and reasoning are statistical methods running on this server. An optional language model, for plain-language summaries only, must also run in-country.
-- **"How many false alarms?"** Show the evaluation table on Learning & model. Low-confidence signals stay on the watch list. Feedback tightens noisy alert types.
+- **"How many false alarms?"** Show the evaluation table on Learning & model.
+  - In the demo period, one chance respiratory blip in Ironworks and Southbank crossed the 50% notification threshold for one day (18 September, 51%), then fell back below 1%.
+  - Every other chance signal stayed on the watch list.
+  - Feedback tightens noisy alert types.
 - **"What does it cost to run?"** A city pilot runs on a single server. National scale is regional instances on in-country infrastructure.

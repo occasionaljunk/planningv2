@@ -224,7 +224,9 @@ def characterize(e: CandidateEvent, data: AnalysisData, det, exclude_nbs: set | 
     top_excess_share = (max(pos_ex.values()) / sum(pos_ex.values())) if pos_ex else 0.0
     top_excess_source = max(pos_ex, key=pos_ex.get) if pos_ex else None
     hhi = float(sum((r["share"]) ** 2 for r in src_rows))
-    n_sources_up = sum(1 for v in excess_src.values() if v >= 3)
+    # a source corroborates only if its own excess is clearly beyond noise (>= 3 and >= 2 standard deviations)
+    exp_by_src = {sid: float(sb.get(sid, 0) * len(cases) * (exp_total / max(obs_total, 1))) for sid in sc.index}
+    n_sources_up = sum(1 for k, v in excess_src.items() if v >= max(3.0, 2 * np.sqrt(max(exp_by_src.get(k, 0.0), 1.0))))
     if corroboration and corroboration["corroborated"]:
         n_sources_up = max(n_sources_up, 2)
     # coding: diagnosis-code mix and agreement between free text and codes

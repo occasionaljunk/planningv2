@@ -140,8 +140,11 @@
     C.hideTip();
     const h = location.hash.replace(/^#\//, "");
     const [page, id] = h.split("/");
-    const v = document.getElementById("view");
-    if (!v) return;
+    const view = document.getElementById("view");
+    if (!view) return;
+    // each navigation renders into its own container, so a slow earlier page cannot overwrite a newer one
+    const v = document.createElement("div");
+    view.replaceChildren(v);
     v.innerHTML = '<div class="empty"><span class="spinner"></span> Loading…</div>';
     const pages = { overview, alerts: alertsPage, alert: (vv) => alertPage(vv, +id), sources, learning, security, audit: auditPage, demo };
     setActive(page === "alert" ? "alerts" : page);
@@ -189,7 +192,7 @@
         <div id="trend"></div></div>`;
     bindCards(v);
     const drawMap = () => {
-      C.choropleth(document.getElementById("map"), {
+      C.choropleth(v.querySelector("#map"), {
         label: "Map of neighbourhoods", scaleLabel: "Ratio:",
         features: o.map.map((n) => {
           const s = mapSyn === "ARI" ? n.syndromes.ARI : n.syndromes[mapSyn];
@@ -204,7 +207,7 @@
     const drawTrend = () => {
       const vals = ovSyn === "ARI" ? o.trend.series.ILI.map((x, i) => x + o.trend.series.RESP[i]) : o.trend.series[ovSyn];
       const avg = vals.map((_, i) => (i < 6 ? null : vals.slice(i - 6, i + 1).reduce((a, b) => a + b, 0) / 7));
-      C.timeChart(document.getElementById("trend"), { dates: o.trend.dates, height: 240, label: "Daily encounters",
+      C.timeChart(v.querySelector("#trend"), { dates: o.trend.dates, height: 240, label: "Daily encounters",
         series: [{ name: "Daily encounters", type: "bar", values: vals, color: C.css("--series-1"), highlight: vals.map((_, i) => i >= vals.length - 7 || true) },
                  { name: "7-day average", type: "line", values: avg, color: C.css("--series-2") }] });
     };
@@ -342,8 +345,8 @@
         const res = await api(`/api/alerts/${id}/cases?limit=100&offset=${offset}`);
         T.innerHTML = `<div class="card"><div class="row between"><div><h2>Records behind this alert</h2><p class="secondary">${num(res.total)} pseudonymised records matching the case definition. ${esc(res.note)}</p></div>
           <div class="row">${can("export") ? `<a class="btn" href="#" id="csv">Export CSV (logged)</a>` : ""}</div></div>
-          <div class="table-wrap"><table><thead><tr><th>Date</th><th>Patient (pseudonym)</th><th>Age</th><th>Sex</th><th>Neighbourhood</th><th>School / university</th><th>Facility</th><th>Source</th><th>Type</th><th>Syndrome</th><th>Triage text</th><th>ICD-10</th><th>Adm.</th><th>ICU</th><th>Died</th>${can("view_raw_message") ? "<th>Source message</th>" : ""}</tr></thead><tbody>
-          ${res.rows.map((x) => `<tr><td>${esc(x.event_date)}</td><td class="mono">${esc(x.patient)}…</td><td>${esc(x.age_band)}</td><td>${esc(x.sex)}</td><td>${esc(x.neighbourhood)}</td><td>${esc(x.institution || "")}</td><td>${esc(x.facility_id)}</td><td>${esc(x.source_id)}</td><td>${esc(x.encounter_class)}</td><td>${esc(x.syndrome)}</td><td>${esc(x.chief_complaint)}</td><td class="mono">${esc(x.icd10)}</td><td>${x.admitted ? "✓" : ""}</td><td>${x.icu ? "✓" : ""}</td><td>${x.died ? "✓" : ""}</td>${can("view_raw_message") ? `<td>${x.raw_id ? `<button class="btn sm raw" data-r="${x.raw_id}">Decrypt</button>` : '<small class="muted">bulk load</small>'}</td>` : ""}</tr>`).join("")}</tbody></table></div>
+          <div class="table-wrap"><table class="dense"><thead><tr><th>Date</th><th>Patient (pseudonym)</th><th>Age</th><th>Sex</th><th>Neighbourhood</th><th>School / university</th><th>Facility</th><th>Source</th><th>Type</th><th>Syndrome</th><th>Triage text</th><th>ICD-10</th><th>Adm.</th><th>ICU</th><th>Died</th>${can("view_raw_message") ? "<th>Source message</th>" : ""}</tr></thead><tbody>
+          ${res.rows.map((x) => `<tr><td>${esc(x.event_date)}</td><td class="mono">${esc(x.patient)}…</td><td>${esc(x.age_band)}</td><td>${esc(x.sex)}</td><td>${esc(x.neighbourhood)}</td><td>${esc(x.institution || "")}</td><td>${esc(x.facility_id)}</td><td>${esc(x.source_id)}</td><td>${esc(x.encounter_class)}</td><td>${esc(x.syndrome)}</td><td class="wrap">${esc(x.chief_complaint)}</td><td class="mono">${esc(x.icd10)}</td><td>${x.admitted ? "✓" : ""}</td><td>${x.icu ? "✓" : ""}</td><td>${x.died ? "✓" : ""}</td>${can("view_raw_message") ? `<td>${x.raw_id ? `<button class="btn sm raw" data-r="${x.raw_id}">Decrypt</button>` : '<small class="muted">bulk load</small>'}</td>` : ""}</tr>`).join("")}</tbody></table></div>
           <div class="row section"><button class="btn sm" id="prev" ${offset ? "" : "disabled"}>← Previous</button><span class="muted">${offset + 1}-${Math.min(offset + 100, res.total)} of ${num(res.total)}</span><button class="btn sm" id="next" ${offset + 100 < res.total ? "" : "disabled"}>Next →</button></div>
           <div id="rawbox"></div></div>`;
         T.querySelector("#prev").addEventListener("click", () => { offset -= 100; load(); });
@@ -462,7 +465,7 @@
         <div class="card kpi"><div class="label">Hosting region</div><div class="value" style="font-size:1.1rem">${esc(p.residency.hosting_region)}</div><div class="sub">approved: ${p.residency.approved_regions.map(esc).join(", ")}</div></div>
         <div class="card kpi"><div class="label">Audit trail</div><div class="value ${p.audit_chain.valid ? "ok" : "bad"}">${p.audit_chain.valid ? ICON.ok + " intact" : ICON.fail + " broken"}</div><div class="sub">${num(p.audit_chain.entries)} hash-chained entries</div></div>
         <div class="card kpi"><div class="label">Outbound network</div><div class="value ${p.egress_guard.installed ? "ok" : "bad"}">${p.egress_guard.installed ? ICON.ok + " guarded" : ICON.fail + " open"}</div><div class="sub">${p.egress_guard.blocked_attempts.length} blocked attempt(s) recorded</div></div></div>
-      <div class="card section"><h2>Data-residency checks</h2><div class="table-wrap"><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>${p.checks.map((c) => `<tr><td>${esc(c.check)}</td><td>${icon(c.status)}</td><td class="secondary">${esc(c.detail)}</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="card section"><h2>Data-residency checks</h2><div class="table-wrap"><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>${p.checks.map((c) => `<tr><td>${esc(c.check)}</td><td style="white-space:nowrap">${icon(c.status)}</td><td class="secondary">${esc(c.detail)}</td></tr>`).join("")}</tbody></table></div></div>
       <div class="grid g2 section">
         <div class="card"><h2>Try to send data abroad</h2><p class="secondary">The process-level egress guard only allows connections to the in-country allow-list (${p.egress_guard.allow_list.map(esc).join(", ")}). Try any external address.</p>
           <div class="row"><input type="text" id="eurl" value="https://api.example-cloud.com/upload" style="flex:1;min-width:200px"><button class="btn primary" id="etest">Attempt connection</button></div><div id="eres" class="section"></div>
